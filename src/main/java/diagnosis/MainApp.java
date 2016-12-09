@@ -1,5 +1,6 @@
 package diagnosis;
 
+import diagnosis.controller.MainController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -17,8 +18,11 @@ public class MainApp extends Application {
         String fxmlFile = "/fxml/MainPage.fxml";
         FXMLLoader loader = new FXMLLoader();
         Parent root = (Parent) loader.load(getClass().getResourceAsStream(fxmlFile));
-        stage.setTitle("JavaFX and Maven");
+        stage.setTitle("CNN Diagnosis");
         stage.setScene(new Scene(root));
         stage.show();
+
+        MainController controller = loader.getController();
+        controller.init();
     }
 }
