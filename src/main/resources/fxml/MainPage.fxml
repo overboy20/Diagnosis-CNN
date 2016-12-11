@@ -14,9 +14,9 @@
         <menus>
           <Menu mnemonicParsing="false" text="Model">
             <items>
-                  <MenuItem mnemonicParsing="false" text="Create model" />
-              <MenuItem mnemonicParsing="false" text="Save model" />
-                  <MenuItem mnemonicParsing="false" text="Load model" />
+                  <MenuItem mnemonicParsing="false" onAction="#createNewModelHandler" text="Create model" />
+              <MenuItem mnemonicParsing="false" onAction="#saveModelHandler" text="Save model" />
+                  <MenuItem mnemonicParsing="false" onAction="#loadModelHandler" text="Load model" />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Edit">
@@ -57,12 +57,12 @@
                               <Label layoutX="14.0" layoutY="74.0" text="Classes:" />
                               <ListView id="classesList" layoutX="15.0" layoutY="93.0" prefHeight="137.0" prefWidth="144.0" />
                               <Label layoutX="167.0" layoutY="123.0" text="Image transformations:" />
-                              <CheckBox layoutX="169.0" layoutY="146.0" mnemonicParsing="false" text="Flip random" />
-                              <CheckBox layoutX="169.0" layoutY="174.0" mnemonicParsing="false" text="Warp" />
-                              <CheckBox layoutX="169.0" layoutY="203.0" mnemonicParsing="false" text="Color" />
+                              <CheckBox fx:id="cbFlip" layoutX="169.0" layoutY="146.0" mnemonicParsing="false" text="Flip random" />
+                              <CheckBox fx:id="cbWarp" layoutX="169.0" layoutY="174.0" mnemonicParsing="false" text="Warp" />
+                              <CheckBox fx:id="cbColor" layoutX="169.0" layoutY="203.0" mnemonicParsing="false" text="Color" />
                               <Label layoutX="167.0" layoutY="93.0" text="Epochs: " />
                               <TextField layoutX="213.0" layoutY="89.0" />
-                              <Button layoutX="321.0" layoutY="183.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="197.0" text="Start training" />
+                              <Button layoutX="321.0" layoutY="183.0" mnemonicParsing="false" onAction="#startTrainingHandler" prefHeight="40.0" prefWidth="197.0" text="Start training" />
                               <TitledPane animated="false" layoutX="20.0" layoutY="243.0" prefHeight="201.0" prefWidth="498.0" text="Test model">
                                 <content>
                                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="91.0" prefWidth="340.0">

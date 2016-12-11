@@ -92,7 +92,7 @@ public class Classificator {
          *  - pathFilter = define additional file load filter to limit size and balance batch content
          **/
         ParentPathLabelGenerator labelMaker = new ParentPathLabelGenerator();
-        File mainPath = new File(System.getProperty("user.dir"), "dl4j-examples/src/main/resources/animals/");
+        File mainPath = new File(System.getProperty("user.dir"), "dl4j-examples/src/main/resources/images/");
         FileSplit fileSplit = new FileSplit(mainPath, NativeImageLoader.ALLOWED_FORMATS, rng);
         BalancedPathFilter pathFilter = new BalancedPathFilter(rng, labelMaker, numExamples, numLabels, batchSize);
 
@@ -127,9 +127,6 @@ public class Classificator {
 
         MultiLayerNetwork network;
         switch (modelType) {
-            case "LeNet":
-                network = lenetModel();
-                break;
             case "AlexNet":
                 network = alexnetModel();
                 break;
@@ -216,37 +213,6 @@ public class Classificator {
 
     private DenseLayer fullyConnected(String name, int out, double bias, double dropOut, Distribution dist) {
         return new DenseLayer.Builder().name(name).nOut(out).biasInit(bias).dropOut(dropOut).dist(dist).build();
-    }
-
-    public MultiLayerNetwork lenetModel() {
-        /**
-         * Revisde Lenet Model approach developed by ramgo2 achieves slightly above random
-         * Reference: https://gist.github.com/ramgo2/833f12e92359a2da9e5c2fb6333351c5
-         **/
-        MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
-                .seed(seed)
-                .iterations(iterations)
-                .regularization(false).l2(0.005) // tried 0.0001, 0.0005
-                .activation("relu")
-                .learningRate(0.0001) // tried 0.00001, 0.00005, 0.000001
-                .weightInit(WeightInit.XAVIER)
-                .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
-                .updater(Updater.RMSPROP).momentum(0.9)
-                .list()
-                .layer(0, convInit("cnn1", channels, 50 ,  new int[]{5, 5}, new int[]{1, 1}, new int[]{0, 0}, 0))
-                .layer(1, maxPool("maxpool1", new int[]{2,2}))
-                .layer(2, conv5x5("cnn2", 100, new int[]{5, 5}, new int[]{1, 1}, 0))
-                .layer(3, maxPool("maxool2", new int[]{2,2}))
-                .layer(4, new DenseLayer.Builder().nOut(500).build())
-                .layer(5, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
-                        .nOut(numLabels)
-                        .activation("softmax")
-                        .build())
-                .backprop(true).pretrain(false)
-                .cnnInputSize(height, width, channels).build();
-
-        return new MultiLayerNetwork(conf);
-
     }
 
     public MultiLayerNetwork alexnetModel() {
