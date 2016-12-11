@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="268.0" prefWidth="276.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="diagnosis.controller.AddLayerController">
+   <children>
+      <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="258.0" prefWidth="279.0">
+         <children>
+            <ComboBox fx:id="layerType" layoutX="105.0" layoutY="61.0" prefWidth="150.0" />
+            <Label layoutX="14.0" layoutY="61.0" prefHeight="25.0" prefWidth="78.0" text="Type of Layer" />
+            <Label layoutX="14.0" layoutY="106.0" text="Name" />
+            <TextField layoutX="105.0" layoutY="102.0" prefHeight="25.0" prefWidth="150.0" />
+            <Label layoutX="14.0" layoutY="148.0" text="Kernel size" />
+            <TextField layoutX="106.0" layoutY="144.0" />
+            <Button layoutX="42.0" layoutY="178.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="183.0" text="Add" />
+            <Button layoutX="42.0" layoutY="219.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="183.0" text="Cancel" />
+            <Label layoutX="83.0" layoutY="21.0" text="Add new layer">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
+         </children>
+      </AnchorPane>
+   </children>
+</VBox>

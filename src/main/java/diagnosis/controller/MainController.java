@@ -2,16 +2,36 @@ package diagnosis.controller;
 
 import diagnosis.Classification.*;
 import diagnosis.Classification.Model.*;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import diagnosis.Utilities.UILogger;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.Stage;
+
+import java.io.File;
 
 public class MainController {
     @FXML private TextArea log;
     @FXML private CheckBox cbFlip;
     @FXML private CheckBox cbWarp;
     @FXML private CheckBox cbColor;
+    @FXML private TextField tfPathImages;
+    @FXML protected ListView<String> listLayers;
+    @FXML protected ListView<String> listClasses;
+
+    private String folderPath;
+    private String testImagePath;
+    public final ObservableList<String> obsListClasses = FXCollections.observableArrayList();
+    public final ObservableList<String> obsListLayers = FXCollections.observableArrayList();
 
     UILogger logger;
     String modelType;
@@ -30,6 +50,15 @@ public class MainController {
         this.modelType = "Loaded";
     }
 
+    @FXML public void choosePathHandler() {
+        DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle("Choose directory");
+        chooser.setInitialDirectory(new File(System.getProperty("user.home")));
+
+        File dir = chooser.showDialog(new Stage());
+        tfPathImages.setText(dir.getAbsolutePath());
+    }
+
     @FXML public void startTrainingHandler() throws Exception {
         logger.insertLine("Training started");
 
@@ -43,11 +72,74 @@ public class MainController {
         model.run();
     }
 
+    //****************LAYERS*************************
+    @FXML public void editNodeHandler() throws Exception {
+        this.openNodeWindow("edit");
+    }
+
+    @FXML public void addNodeBeforeHandler() throws Exception {
+        this.openNodeWindow("addBefore");
+    }
+
+    @FXML public void addNodeAfterHandler() throws Exception {
+        this.openNodeWindow("addAfter");
+    }
+
+    @FXML public void deleteNodeHandler() {
+
+    }
+    //***********************************************
+
+    private void openNodeWindow(String mode) throws Exception {
+        Stage nodeWindow = new Stage();
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/AddNode.fxml"));
+        VBox root = loader.load();
+        Scene scene = new Scene(root);
+        nodeWindow.setScene(scene);
+        nodeWindow.setResizable(false);
+        nodeWindow.show();
+        AddLayerController controller = loader.getController();
+        nodeWindow.setTitle("Add Layer");
+        controller.init(this);
+
+        switch(mode) {
+            case "edit":
+                //
+                break;
+            case "addBefore":
+                //
+                break;
+            case "addAfter":
+                //
+                break;
+            default:
+                throw new Exception("Not supported layer operation!");
+        }
+    }
+
+
+
     public void init() {
         logger = new UILogger(this.log);
 
-        //logger.insertLine("good");
-        //logger.insertLine("very good");
+        listLayers.setItems(obsListLayers);
+        listClasses.setItems(obsListClasses);
+
+        obsListClasses.add("class 1");
+        obsListClasses.add("class 2");
+        obsListClasses.add("class 3");
+        obsListClasses.add("class 4");
+        obsListClasses.add("class 5");
+
+        obsListLayers.add("Conv 3x3");
+        obsListLayers.add("Pool 3x3");
+        obsListLayers.add("Conv 5x5");
+        obsListLayers.add("Pool 3x3");
+        obsListLayers.add("Conv 3x3");
+        obsListLayers.add("Conv 4x4");
+        obsListLayers.add("Conv 5x5");
+        obsListLayers.add("Pool 3x3");
+        obsListLayers.add("MPL");
 
         this.modelType = "";
     }
