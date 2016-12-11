@@ -62,7 +62,7 @@
                               <CheckBox layoutX="169.0" layoutY="203.0" mnemonicParsing="false" text="Color" />
                               <Label layoutX="167.0" layoutY="93.0" text="Epochs: " />
                               <TextField layoutX="213.0" layoutY="89.0" />
-                              <Button layoutX="321.0" layoutY="183.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="197.0" text="Start raining" />
+                              <Button layoutX="321.0" layoutY="183.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="197.0" text="Start training" />
                               <TitledPane animated="false" layoutX="20.0" layoutY="243.0" prefHeight="201.0" prefWidth="498.0" text="Test model">
                                 <content>
                                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="91.0" prefWidth="340.0">

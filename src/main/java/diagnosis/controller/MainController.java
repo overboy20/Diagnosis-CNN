@@ -3,14 +3,17 @@ package diagnosis.controller;
 import diagnosis.Classification.*;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextArea;
+import diagnosis.Utilities.UILogger;
 
 public class MainController {
     @FXML
     private TextArea log;
+    UILogger logger;
 
     public void init() {
-        log.setText("");
-        log.setText("good");
-        log.setText(log.getText() + "\n" + "very good");
+        logger = new UILogger(this.log);
+
+        logger.insertLine("good");
+        logger.insertLine("very good");
     }
 }
