@@ -33,7 +33,5 @@ public class MainPageController {
         System.out.println("here 2");
     }
 
-    public void init() {
-        System.out.println("init main page controller");
-    }
+    public void init() { }
 }

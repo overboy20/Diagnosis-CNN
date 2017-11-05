@@ -1,5 +1,6 @@
 package diagnosis.Classification.Model.Predefined;
 
+import diagnosis.Classification.Helpers.TrainingSession;
 import diagnosis.Classification.Model.Model;
 import diagnosis.Classification.Model.ModelInterface;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
@@ -20,6 +21,10 @@ public class LenetModel extends Model implements ModelInterface {
     protected int iterations = 1;
     protected int channels = 3;
     protected int numLabels = 4;
+
+    public LenetModel(TrainingSession session) {
+        super(session);
+    }
 
     public MultiLayerNetwork getModel() {
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()

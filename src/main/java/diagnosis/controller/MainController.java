@@ -67,9 +67,6 @@ public class MainController {
             cbWarp.isSelected(),
             cbColor.isSelected()
         };
-
-        Model model = new Model();
-        model.run();
     }
 
     public void init() {

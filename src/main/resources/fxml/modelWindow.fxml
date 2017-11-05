@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
@@ -9,8 +10,8 @@
         <menus>
           <Menu mnemonicParsing="false" text="File">
             <items>
-              <MenuItem fx:id="menuitemSave" mnemonicParsing="false" text="Save to file" />
-                  <MenuItem fx:id="menuitemClose" mnemonicParsing="false" text="Close" />
+              <MenuItem fx:id="menuitemSave" mnemonicParsing="false" onAction="#onSave" text="Save to file" />
+                  <MenuItem fx:id="menuitemClose" mnemonicParsing="false" onAction="#onClose" text="Close" />
             </items>
           </Menu>
         </menus>
@@ -20,26 +21,24 @@
             <Pane prefHeight="424.0" prefWidth="545.0">
                <children>
                   <Button fx:id="btnSelectPath" layoutX="497.0" layoutY="14.0" mnemonicParsing="false" text="..." />
-                  <TextField fx:id="inputPath" layoutX="99.0" layoutY="14.0" prefHeight="22.0" prefWidth="385.0" />
+                  <TextField fx:id="inputPath" editable="false" layoutX="99.0" layoutY="14.0" prefHeight="22.0" prefWidth="385.0" />
                   <Label layoutX="14.0" layoutY="18.0" text="Path to images:" />
-                  <TextArea layoutX="10.0" layoutY="260.0" prefHeight="155.0" prefWidth="514.0" />
-                  <Button fx:id="btnStartTraining" layoutX="14.0" layoutY="229.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="90.0" text="Start training" />
+                  <TextArea fx:id="textareaLog" editable="false" layoutX="10.0" layoutY="260.0" prefHeight="155.0" prefWidth="514.0" />
+                  <Button fx:id="btnStartTraining" layoutX="14.0" layoutY="229.0" mnemonicParsing="false" onAction="#startTrainingClick" prefHeight="22.0" prefWidth="90.0" text="Start training" />
                   <Label layoutX="14.0" layoutY="53.0" text="Epochs number:" />
-                  <Slider fx:id="sliderEpochs" layoutX="99.0" layoutY="54.0" prefHeight="13.0" prefWidth="227.0" />
-                  <Label layoutX="335.0" layoutY="54.0" text="0" />
-                  <Label layoutX="14.0" layoutY="82.0" text="Iterations:" />
-                  <Slider fx:id="sliderIterations" layoutX="99.0" layoutY="83.0" prefHeight="13.0" prefWidth="227.0" />
-                  <Label layoutX="336.0" layoutY="83.0" text="0" />
-                  <Label layoutX="14.0" layoutY="114.0" text="Image transformations:" />
-                  <CheckBox fx:id="boxFlipRandom" layoutX="139.0" layoutY="113.0" mnemonicParsing="false" text="Flip Random" />
-                  <CheckBox fx:id="boxColor" layoutX="297.0" layoutY="113.0" mnemonicParsing="false" text="Color" />
-                  <CheckBox fx:id="boxWrap" layoutX="230.0" layoutY="113.0" mnemonicParsing="false" text="Warp" />
-                  <Label layoutX="244.0" layoutY="142.0" text="Additional" />
+                  <Slider fx:id="sliderEpochs" layoutX="99.0" layoutY="54.0" prefHeight="13.0" prefWidth="418.0" />
+                  <Label layoutX="14.0" layoutY="85.0" text="Iterations:" />
+                  <Slider fx:id="sliderIterations" layoutX="99.0" layoutY="86.0" prefHeight="13.0" prefWidth="418.0" />
+                  <Label layoutX="14.0" layoutY="122.0" text="Image transformations:" />
+                  <CheckBox fx:id="boxFlipRandom" layoutX="139.0" layoutY="121.0" mnemonicParsing="false" text="Flip Random" />
+                  <CheckBox fx:id="boxColor" layoutX="297.0" layoutY="121.0" mnemonicParsing="false" text="Color" />
+                  <CheckBox fx:id="boxWrap" layoutX="230.0" layoutY="121.0" mnemonicParsing="false" text="Warp" />
+                  <Label layoutX="244.0" layoutY="147.0" text="Additional" />
                   <Label layoutX="14.0" layoutY="168.0" text="Learning rate:" />
                   <Label layoutX="271.0" layoutY="170.0" text="Activation:" />
                   <ComboBox fx:id="checkboxActivation" layoutX="343.0" layoutY="166.0" prefHeight="22.0" prefWidth="181.0" promptText="Select function" />
                   <TextField fx:id="inputLearningRate" layoutX="100.0" layoutY="166.0" prefHeight="22.0" prefWidth="163.0" text="0.01" />
-                  <ProgressBar layoutX="110.0" layoutY="229.0" prefHeight="22.0" prefWidth="418.0" progress="0.0" />
+                  <ProgressBar fx:id="progress" layoutX="110.0" layoutY="229.0" prefHeight="22.0" prefWidth="418.0" progress="0.0" />
                </children>
             </Pane>
          </children>

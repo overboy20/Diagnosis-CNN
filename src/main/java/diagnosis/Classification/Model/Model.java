@@ -1,5 +1,6 @@
 package diagnosis.Classification.Model;
 
+import diagnosis.Classification.Helpers.TrainingSession;
 import org.apache.commons.io.FilenameUtils;
 import org.datavec.api.io.filters.BalancedPathFilter;
 import org.datavec.api.io.labels.ParentPathLabelGenerator;
@@ -37,32 +38,28 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-public class Model extends Layer {
+abstract public class Model extends Layer {
 
-    MultiLayerNetwork network;
-    boolean flipTransform;
-    boolean warpTransform;
-    boolean colorTransform;
+    protected MultiLayerNetwork network;
 
     protected int height = 100;
     protected int width = 100;
     protected int channels = 3;
-    protected int numExamples = 80;
-    protected int numLabels = 4;
-    protected int batchSize = 20;
 
     protected long seed = 42;
     protected Random rng = new Random(seed);
     protected int listenerFreq = 1;
-    protected int iterations = 1;
-    protected int epochs = 2;
     protected double splitTrainTest = 0.8;
-    protected int nCores = 2;
 
     protected boolean alreadyTrained = false;
+    protected TrainingSession session;
 
-    public void run() throws Exception {
+    public Model(TrainingSession session) {
+        this.session = session;
+    }
 
+    public void run() {
+        
     }
 
     public void setAlreadyTrained(boolean flag) {

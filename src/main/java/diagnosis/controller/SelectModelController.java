@@ -14,9 +14,7 @@ public class SelectModelController {
 
     @FXML private HBox root;
 
-    public void init() {
-        System.out.println("init select model controller");
-    }
+    public void init() { }
 
     @FXML public void lenetModel() throws IOException {
         this.openModelWindow(ModelInterface.MODEL_LENET);
@@ -37,6 +35,7 @@ public class SelectModelController {
         Scene scene = new Scene(root);
         modelWindow.setScene(scene);
         modelWindow.setResizable(false);
+        modelWindow.setTitle("New Model");
         modelWindow.show();
 
         Stage currentStage = (Stage) this.root.getScene().getWindow();

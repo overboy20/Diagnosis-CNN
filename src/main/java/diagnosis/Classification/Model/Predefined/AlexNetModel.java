@@ -1,5 +1,6 @@
 package diagnosis.Classification.Model.Predefined;
 
+import diagnosis.Classification.Helpers.TrainingSession;
 import diagnosis.Classification.Model.Model;
 import diagnosis.Classification.Model.ModelInterface;
 
@@ -20,6 +21,10 @@ public class AlexNetModel extends Model implements ModelInterface {
     protected int iterations = 1;
     protected int channels = 3;
     protected int numLabels = 4;
+
+    public AlexNetModel(TrainingSession session) {
+        super(session);
+    }
 
     public MultiLayerNetwork getModel() {
         double nonZeroBias = 1;
