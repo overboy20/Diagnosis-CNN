@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox fx:id="root" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="diagnosis.controller.MainPageController">
+   <children>
+      <Button fx:id="btnCreateModel" mnemonicParsing="false" onAction="#createNewModelClickHandler" prefHeight="48.0" prefWidth="120.0" text="Create New Model">
+         <VBox.margin>
+            <Insets />
+         </VBox.margin>
+      </Button>
+      <Button fx:id="btnLoadModel" mnemonicParsing="false" onAction="#loadModelClickHandler" prefHeight="58.0" prefWidth="120.0" text="Load Existing Model">
+         <VBox.margin>
+            <Insets top="20.0" />
+         </VBox.margin>
+      </Button>
+   </children>
+</VBox>

@@ -1,6 +1,6 @@
 package diagnosis;
 
-import diagnosis.controller.MainController;
+import diagnosis.controller.MainPageController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -15,14 +15,14 @@ public class MainApp extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        String fxmlFile = "/fxml/MainPage.fxml";
+        String fxmlFile = "/fxml/MainWindow.fxml";
         FXMLLoader loader = new FXMLLoader();
         Parent root = (Parent) loader.load(getClass().getResourceAsStream(fxmlFile));
         stage.setTitle("CNN Diagnosis");
         stage.setScene(new Scene(root));
         stage.show();
 
-        MainController controller = loader.getController();
+        MainPageController controller = loader.getController();
         controller.init();
     }
 }

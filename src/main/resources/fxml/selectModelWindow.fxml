@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<HBox fx:id="root" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="diagnosis.controller.SelectModelController">
+   <children>
+      <Button fx:id="btnLenet" mnemonicParsing="false" onAction="#lenetModel" prefHeight="54.0" prefWidth="93.0" text="Lenet">
+         <HBox.margin>
+            <Insets right="5.0" />
+         </HBox.margin>
+      </Button>
+      <Button fx:id="btnAlexNet" mnemonicParsing="false" onAction="#alexnetModel" prefHeight="54.0" prefWidth="93.0" text="AlexNet">
+         <HBox.margin>
+            <Insets right="5.0" />
+         </HBox.margin>
+      </Button>
+      <Button fx:id="btnCustomModel" mnemonicParsing="false" onAction="#customModel" prefHeight="54.0" prefWidth="93.0" text="Custom" />
+   </children>
+</HBox>

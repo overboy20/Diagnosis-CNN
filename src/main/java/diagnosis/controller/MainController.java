@@ -68,56 +68,9 @@ public class MainController {
             cbColor.isSelected()
         };
 
-        Model model = new Model(transformations);
+        Model model = new Model();
         model.run();
     }
-
-    //****************LAYERS*************************
-    @FXML public void editNodeHandler() throws Exception {
-        this.openNodeWindow("edit");
-    }
-
-    @FXML public void addNodeBeforeHandler() throws Exception {
-        this.openNodeWindow("addBefore");
-    }
-
-    @FXML public void addNodeAfterHandler() throws Exception {
-        this.openNodeWindow("addAfter");
-    }
-
-    @FXML public void deleteNodeHandler() {
-
-    }
-    //***********************************************
-
-    private void openNodeWindow(String mode) throws Exception {
-        Stage nodeWindow = new Stage();
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/AddNode.fxml"));
-        VBox root = loader.load();
-        Scene scene = new Scene(root);
-        nodeWindow.setScene(scene);
-        nodeWindow.setResizable(false);
-        nodeWindow.show();
-        AddLayerController controller = loader.getController();
-        nodeWindow.setTitle("Add Layer");
-        controller.init(this);
-
-        switch(mode) {
-            case "edit":
-                //
-                break;
-            case "addBefore":
-                //
-                break;
-            case "addAfter":
-                //
-                break;
-            default:
-                throw new Exception("Not supported layer operation!");
-        }
-    }
-
-
 
     public void init() {
         logger = new UILogger(this.log);
