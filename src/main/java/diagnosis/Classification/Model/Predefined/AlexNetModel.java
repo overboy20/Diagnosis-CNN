@@ -2,7 +2,6 @@ package diagnosis.Classification.Model.Predefined;
 
 import diagnosis.Classification.Helpers.TrainingSession;
 import diagnosis.Classification.Model.Model;
-import diagnosis.Classification.Model.ModelInterface;
 
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.*;
@@ -14,7 +13,7 @@ import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 
-public class AlexNetModel extends Model implements ModelInterface {
+public class AlexNetModel extends Model {
     protected int height = 100;
     protected int width = 100;
     protected long seed = 42;
@@ -26,6 +25,7 @@ public class AlexNetModel extends Model implements ModelInterface {
         super(session);
     }
 
+    @Override
     public MultiLayerNetwork getModel() {
         double nonZeroBias = 1;
         double dropOut = 0.5;

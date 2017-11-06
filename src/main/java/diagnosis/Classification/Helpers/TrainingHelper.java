@@ -1,6 +1,10 @@
 package diagnosis.Classification.Helpers;
 
+import diagnosis.Classification.Model.CustomModel;
 import diagnosis.Classification.Model.Model;
+import diagnosis.Classification.Model.Predefined.AlexNetModel;
+import diagnosis.Classification.Model.Predefined.LenetModel;
+import diagnosis.Utilities.UILogger;
 
 public class TrainingHelper {
 
@@ -16,31 +20,16 @@ public class TrainingHelper {
     protected int modelType;
     protected Model model;
 
-    protected String path;
-    protected int epochs;
-    protected int iterations;
-
-    // Image transformations
-    protected boolean flipRandom;
-    protected boolean warpTransformation;
-    protected boolean colorTransformation;
-
     protected double learningRate;
     protected String activationFunction;
+    protected TrainingSession session;
 
-    public TrainingHelper(int epochs, int iterations) {
-        this.epochs = epochs;
-        this.iterations = iterations;
+    public TrainingHelper(TrainingSession session) {
+        this.session = session;
     }
 
     public void setModelType(int type) {
         this.modelType = type;
-    }
-
-    public void setTransformations(boolean flip, boolean warp, boolean color) {
-        this.flipRandom = flip;
-        this.warpTransformation = warp;
-        this.colorTransformation = color;
     }
 
     public void setAdditionalParameters(double learningRate, String activation) {
@@ -48,7 +37,28 @@ public class TrainingHelper {
         this.activationFunction = activation;
     }
 
-    public void start() {
-        this.model.run();
+    public void start(UILogger logger) {
+        try {
+            this.model = this.getModelByType(this.modelType);
+            this.model.setLogger(logger);
+
+            this.model.run();
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    protected Model getModelByType(int type) throws Exception {
+        switch(type) {
+            case Model.MODEL_ALEXNET:
+                return new AlexNetModel(this.session);
+            case Model.MODEL_LENET:
+                return new LenetModel(this.session);
+            case Model.MODEL_CUSTOM:
+                return new CustomModel(this.session);
+            default:
+                throw new Exception("Invalid Training Model type");
+        }
     }
 }

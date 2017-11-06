@@ -1,6 +1,7 @@
 package diagnosis.Classification.Model;
 
 import diagnosis.Classification.Helpers.TrainingSession;
+import diagnosis.Utilities.UILogger;
 import org.apache.commons.io.FilenameUtils;
 import org.datavec.api.io.filters.BalancedPathFilter;
 import org.datavec.api.io.labels.ParentPathLabelGenerator;
@@ -40,6 +41,10 @@ import java.util.Random;
 
 abstract public class Model extends Layer {
 
+    public static final int MODEL_ALEXNET = 1;
+    public static final int MODEL_LENET   = 2;
+    public static final int MODEL_CUSTOM  = 3;
+
     protected MultiLayerNetwork network;
 
     protected int height = 100;
@@ -53,13 +58,131 @@ abstract public class Model extends Layer {
 
     protected boolean alreadyTrained = false;
     protected TrainingSession session;
+    protected UILogger logger;
+
+    protected ParentPathLabelGenerator labelMaker;
+    protected InputSplit trainData;
+    protected InputSplit testData;
 
     public Model(TrainingSession session) {
         this.session = session;
     }
 
-    public void run() {
-        
+    abstract public MultiLayerNetwork getModel();
+
+    public void run() throws Exception {
+        this.logger.insertLine("run...");
+        this.network = this.getModel();
+
+        this.dataSetup();
+
+        this.network.init();
+        this.network.setListeners(new ScoreIterationListener(listenerFreq));
+
+        this.trainWithoutTransformations();
+        this.trainWithTransformations();
+        this.evaluateModel();
+    }
+
+    public void dataSetup() {
+        this.logger.insertLine("Data Setup...");
+
+        int numExamples = this.session.getNumExamples();
+
+        this.labelMaker = new ParentPathLabelGenerator();
+        File mainPath = new File(this.session.getPath());
+        FileSplit fileSplit = new FileSplit(mainPath, NativeImageLoader.ALLOWED_FORMATS, rng);
+        BalancedPathFilter pathFilter = new BalancedPathFilter(rng, this.labelMaker, numExamples, this.session.getNumLabels(), this.session.getBatchSize());
+
+        InputSplit[] inputSplit = fileSplit.sample(pathFilter, numExamples * (1 + splitTrainTest), numExamples * (1 - splitTrainTest));
+        this.trainData = inputSplit[0];
+        this.testData = inputSplit[1];
+
+        this.logger.insertLine("Data Setup Finished.");
+    }
+
+    protected void trainWithTransformations() throws Exception {
+        this.logger.insertLine("Start training with transformations...");
+
+        ImageRecordReader recordReader = new ImageRecordReader(height, width, channels, this.labelMaker);
+        DataSetIterator dataIterator;
+        MultipleEpochsIterator trainIter;
+        DataNormalization scaler = new ImagePreProcessingScaler(0, 1);
+
+        ImageTransform flipTransform1 = new FlipImageTransform(rng);
+        ImageTransform flipTransform2 = new FlipImageTransform(new Random(123));
+        ImageTransform warpTransform = new WarpImageTransform(rng, 42);
+        //ImageTransform colorTransform = new ColorConversionTransform(new Random(seed), COLOR_BGR2YCrCb);
+        List<ImageTransform> transforms = Arrays.asList(new ImageTransform[]{flipTransform1, warpTransform, flipTransform2});
+
+        for (ImageTransform transform : transforms) {
+            System.out.print("\nTraining on transformation: " + transform.getClass().toString() + "\n\n");
+            recordReader.initialize(trainData, transform);
+            dataIterator = new RecordReaderDataSetIterator(recordReader, this.session.getBatchSize(), 1, this.session.getNumLabels());
+            scaler.fit(dataIterator);
+            dataIterator.setPreProcessor(scaler);
+            trainIter = new MultipleEpochsIterator(this.session.getNumEpochs(), dataIterator, this.session.getNCores());
+            network.fit(trainIter);
+
+            this.logger.insertLine("Training with transformations finished.");
+        }
+    }
+
+    protected void trainWithoutTransformations() throws Exception {
+        this.logger.insertLine("Start training without transformations...");
+
+        ImageRecordReader recordReader = new ImageRecordReader(height, width, channels, this.labelMaker);
+        DataSetIterator dataIterator;
+        MultipleEpochsIterator trainIter;
+        DataNormalization scaler = new ImagePreProcessingScaler(0, 1);
+
+        recordReader.initialize(trainData, null);
+        dataIterator = new RecordReaderDataSetIterator(recordReader, this.session.getBatchSize(), 1, this.session.getNumLabels());
+        scaler.fit(dataIterator);
+        dataIterator.setPreProcessor(scaler);
+        trainIter = new MultipleEpochsIterator(this.session.getNumEpochs(), dataIterator, this.session.getNCores());
+        network.fit(trainIter);
+
+        this.logger.insertLine("Training without transformations finished.");
+    }
+
+    protected void evaluateModel() throws Exception {
+        this.logger.insertLine("Start Evaluate model...");
+
+        ImageRecordReader recordReader = new ImageRecordReader(height, width, channels, this.labelMaker);
+        DataNormalization scaler = new ImagePreProcessingScaler(0, 1);
+
+        recordReader.initialize(testData);
+        DataSetIterator dataIterator;
+        dataIterator = new RecordReaderDataSetIterator(recordReader, this.session.getBatchSize(), 1, this.session.getNumLabels());
+        scaler.fit(dataIterator);
+        dataIterator.setPreProcessor(scaler);
+        Evaluation eval = network.evaluate(dataIterator);
+
+        this.logger.insertLine("Model Evaluation finished.");
+        this.logger.insertLine(eval.stats(true));
+
+        this.getPrediction(dataIterator);
+    }
+
+    protected void getPrediction(DataSetIterator dataIter) {
+        dataIter.reset();
+        DataSet testDataSet = dataIter.next();
+        String expectedResult = testDataSet.getLabelName(0);
+        List<String> predict = network.predict(testDataSet);
+        String modelResult = predict.get(0);
+
+        this.logger.insertLine("\nFor a single example that is labeled " + expectedResult + " the model predicted " + modelResult + "\n\n");
+    }
+
+    public void save() {
+        this.logger.insertLine("Saving...");
+
+        String basePath = FilenameUtils.concat(System.getProperty("user.dir"), this.session.getPath());
+        NetSaverLoaderUtils.saveNetworkAndParameters(network, basePath);
+        NetSaverLoaderUtils.saveUpdators(network, basePath);
+
+        this.logger.insertLine("Saved Successfully!");
     }
 
     public void setAlreadyTrained(boolean flag) {
@@ -68,5 +191,9 @@ abstract public class Model extends Layer {
 
     public boolean getAlreadyTrained() {
         return this.alreadyTrained;
+    }
+
+    public void setLogger(UILogger logger) {
+        this.logger = logger;
     }
 }

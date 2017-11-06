@@ -2,7 +2,6 @@ package diagnosis.Classification.Model.Predefined;
 
 import diagnosis.Classification.Helpers.TrainingSession;
 import diagnosis.Classification.Model.Model;
-import diagnosis.Classification.Model.ModelInterface;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
@@ -14,7 +13,7 @@ import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 
-public class LenetModel extends Model implements ModelInterface {
+public class LenetModel extends Model {
     protected int height = 100;
     protected int width = 100;
     protected long seed = 42;
@@ -26,6 +25,7 @@ public class LenetModel extends Model implements ModelInterface {
         super(session);
     }
 
+    @Override
     public MultiLayerNetwork getModel() {
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
                 .seed(seed)

@@ -1,11 +1,9 @@
 package diagnosis.controller;
 
 import diagnosis.Classification.Helpers.TrainingHelper;
-import diagnosis.Classification.Model.CustomModel;
+import diagnosis.Classification.Helpers.TrainingSession;
 import diagnosis.Classification.Model.Model;
-import diagnosis.Classification.Model.ModelInterface;
-import diagnosis.Classification.Model.Predefined.AlexNetModel;
-import diagnosis.Classification.Model.Predefined.LenetModel;
+import diagnosis.Utilities.UILogger;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
@@ -32,7 +30,7 @@ public class ModelController {
     @FXML protected MenuItem menuitemSave;
     @FXML protected MenuItem menuitemClose;
 
-    protected int MODEL_TYPE = ModelInterface.MODEL_ALEXNET;
+    protected int MODEL_TYPE = Model.MODEL_ALEXNET;
 
     public void init() {
         this.initSliders();
@@ -97,11 +95,20 @@ public class ModelController {
         Double iterations = this.sliderIterations.getValue();
         String learningRate = this.inputLearningRate.getText();
 
-        TrainingHelper helper = new TrainingHelper(epochs.intValue(), iterations.intValue());
-        helper.setTransformations(this.boxFlipRandom.isSelected(), this.boxWrap.isSelected(), this.boxColor.isSelected());
+        TrainingSession session = new TrainingSession();
+        session.initTransformations(this.boxFlipRandom.isSelected(), this.boxWrap.isSelected(), this.boxColor.isSelected());
+        session.initTrainingOptions(iterations.intValue(), epochs.intValue());
+        session.setImagesPath(this.inputPath.getText());
+
+        TrainingHelper helper = new TrainingHelper(session);
         helper.setModelType(this.MODEL_TYPE);
-        helper.setAdditionalParameters(Integer.parseInt(learningRate), this.checkboxActivation.getSelectionModel().getSelectedItem().toString());
-        helper.start();
+
+        if(this.checkboxActivation.getSelectionModel().getSelectedItem() == null) {
+            return;
+        }
+
+        helper.setAdditionalParameters(Double.parseDouble(learningRate), this.checkboxActivation.getSelectionModel().getSelectedItem().toString());
+        helper.start(new UILogger(this.textareaLog));
     }
 
     @FXML public void onClose() {
