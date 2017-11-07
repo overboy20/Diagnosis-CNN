@@ -1,19 +1,13 @@
 package diagnosis.controller;
 
-import diagnosis.Classification.*;
-import diagnosis.Classification.Model.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import diagnosis.Utilities.UILogger;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
@@ -37,16 +31,16 @@ public class MainController {
     String modelType;
 
     @FXML public void createNewModelHandler() {
-        logger.insertLine("new model");
+        logger.log("new model");
         this.modelType = "new";
     }
 
     @FXML public void saveModelHandler() {
-        logger.insertLine("save model");
+        logger.log("save model");
     }
 
     @FXML public void loadModelHandler() {
-        logger.insertLine("load model");
+        logger.log("load model");
         this.modelType = "Loaded";
     }
 
@@ -60,7 +54,7 @@ public class MainController {
     }
 
     @FXML public void startTrainingHandler() throws Exception {
-        logger.insertLine("Training started");
+        logger.log("Training started");
 
         boolean transformations[] = {
             cbFlip.isSelected(),

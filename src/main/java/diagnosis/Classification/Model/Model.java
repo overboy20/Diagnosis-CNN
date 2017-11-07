@@ -2,40 +2,26 @@ package diagnosis.Classification.Model;
 
 import diagnosis.Classification.Helpers.TrainingSession;
 import diagnosis.Utilities.UILogger;
-import org.apache.commons.io.FilenameUtils;
 import org.datavec.api.io.filters.BalancedPathFilter;
 import org.datavec.api.io.labels.ParentPathLabelGenerator;
 import org.datavec.api.split.FileSplit;
 import org.datavec.api.split.InputSplit;
 import org.datavec.image.loader.NativeImageLoader;
 import org.datavec.image.recordreader.ImageRecordReader;
-import org.datavec.image.transform.ColorConversionTransform;
-import org.datavec.image.transform.FlipImageTransform;
 import org.datavec.image.transform.ImageTransform;
-import org.datavec.image.transform.WarpImageTransform;
 import org.deeplearning4j.datasets.datavec.RecordReaderDataSetIterator;
 import org.deeplearning4j.datasets.iterator.MultipleEpochsIterator;
 import org.deeplearning4j.eval.Evaluation;
-import org.deeplearning4j.nn.api.OptimizationAlgorithm;
-import org.deeplearning4j.nn.conf.*;
-import org.deeplearning4j.nn.conf.distribution.GaussianDistribution;
-import org.deeplearning4j.nn.conf.distribution.NormalDistribution;
-import org.deeplearning4j.nn.conf.inputs.InvalidInputTypeException;
-import org.deeplearning4j.nn.conf.layers.LocalResponseNormalization;
-import org.deeplearning4j.nn.conf.layers.OutputLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
-import org.deeplearning4j.nn.weights.WeightInit;
 import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
 import org.deeplearning4j.util.NetSaverLoaderUtils;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.dataset.api.preprocessor.DataNormalization;
 import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
-import org.nd4j.linalg.lossfunctions.LossFunctions;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -60,10 +46,6 @@ abstract public class Model extends Layer {
     protected TrainingSession session;
     protected UILogger logger;
 
-    protected ParentPathLabelGenerator labelMaker;
-    protected InputSplit trainData;
-    protected InputSplit testData;
-
     public Model(TrainingSession session) {
         this.session = session;
     }
@@ -71,118 +53,109 @@ abstract public class Model extends Layer {
     abstract public MultiLayerNetwork getModel();
 
     public void run() throws Exception {
-        this.logger.insertLine("run...");
+        System.out.println(session.getNumEpochs());
+        System.out.println(session.getNumIterations());
+        this.logger.log("run...");
+
         this.network = this.getModel();
+        this.trainModel();
+        //TODO: Redirect default logging to application logger
+        //TODO: split threads
 
-        this.dataSetup();
+        this.save();
 
+        this.logger.log("Network weight params: " + network.params().toString());
+        this.logger.log("Done");
+    }
+
+    protected void trainModel() throws Exception {
+        this.logger.log("Load data....");
+        /**
+         * Data Setup -> organize and limit data file paths:
+         *  - mainPath = path to image files
+         *  - fileSplit = define basic dataset split with limits on format
+         *  - pathFilter = define additional file load filter to limit size and balance batch content
+         **/
+        ParentPathLabelGenerator labelMaker = new ParentPathLabelGenerator();
+        File mainPath = new File(this.session.getPath());
+        FileSplit fileSplit = new FileSplit(mainPath, NativeImageLoader.ALLOWED_FORMATS, rng);
+        BalancedPathFilter pathFilter = new BalancedPathFilter(rng, labelMaker, this.session.getNumExamples(), this.session.getNumLabels(), this.session.getBatchSize());
+
+        /**
+         * Data Setup -> train test split
+         *  - inputSplit = define train and test split
+         **/
+        InputSplit[] inputSplit = fileSplit.sample(pathFilter, this.session.getNumExamples() * (1 + splitTrainTest), this.session.getNumExamples() * (1 - splitTrainTest));
+        InputSplit trainData = inputSplit[0];
+        InputSplit testData = inputSplit[1];
+
+        ArrayList<ImageTransform> transforms = this.session.getTransformations();
+
+        /**
+         * Data Setup -> normalization
+         *  - how to normalize images and generate large dataset to train on
+         **/
+        DataNormalization scaler = new ImagePreProcessingScaler(0, 1);
+
+        this.logger.log("Build model....");
         this.network.init();
         this.network.setListeners(new ScoreIterationListener(listenerFreq));
 
-        this.trainWithoutTransformations();
-        this.trainWithTransformations();
-        this.evaluateModel();
-    }
-
-    public void dataSetup() {
-        this.logger.insertLine("Data Setup...");
-
-        int numExamples = this.session.getNumExamples();
-
-        this.labelMaker = new ParentPathLabelGenerator();
-        File mainPath = new File(this.session.getPath());
-        FileSplit fileSplit = new FileSplit(mainPath, NativeImageLoader.ALLOWED_FORMATS, rng);
-        BalancedPathFilter pathFilter = new BalancedPathFilter(rng, this.labelMaker, numExamples, this.session.getNumLabels(), this.session.getBatchSize());
-
-        InputSplit[] inputSplit = fileSplit.sample(pathFilter, numExamples * (1 + splitTrainTest), numExamples * (1 - splitTrainTest));
-        this.trainData = inputSplit[0];
-        this.testData = inputSplit[1];
-
-        this.logger.insertLine("Data Setup Finished.");
-    }
-
-    protected void trainWithTransformations() throws Exception {
-        this.logger.insertLine("Start training with transformations...");
-
-        ImageRecordReader recordReader = new ImageRecordReader(height, width, channels, this.labelMaker);
-        DataSetIterator dataIterator;
+        /**
+         * Data Setup -> define how to load data into net:
+         *  - recordReader = the reader that loads and converts image data pass in inputSplit to initialize
+         *  - dataIter = a generator that only loads one batch at a time into memory to save memory
+         *  - trainIter = uses MultipleEpochsIterator to ensure model runs through the data for all epochs
+         **/
+        ImageRecordReader recordReader = new ImageRecordReader(height, width, channels, labelMaker);
+        DataSetIterator dataIter;
         MultipleEpochsIterator trainIter;
-        DataNormalization scaler = new ImagePreProcessingScaler(0, 1);
 
-        ImageTransform flipTransform1 = new FlipImageTransform(rng);
-        ImageTransform flipTransform2 = new FlipImageTransform(new Random(123));
-        ImageTransform warpTransform = new WarpImageTransform(rng, 42);
-        //ImageTransform colorTransform = new ColorConversionTransform(new Random(seed), COLOR_BGR2YCrCb);
-        List<ImageTransform> transforms = Arrays.asList(new ImageTransform[]{flipTransform1, warpTransform, flipTransform2});
+        this.logger.log("Train model without transformations....");
+        // Train without transformations
+        recordReader.initialize(trainData, null);
+        dataIter = new RecordReaderDataSetIterator(recordReader, this.session.getBatchSize(), 1, this.session.getNumLabels());
+        scaler.fit(dataIter);
+        dataIter.setPreProcessor(scaler);
+        trainIter = new MultipleEpochsIterator(this.session.getNumEpochs(), dataIter, this.session.getNCores());
+        this.network.fit(trainIter);
 
+        this.logger.log("Train model with transformations....");
+        // Train with transformations
         for (ImageTransform transform : transforms) {
             System.out.print("\nTraining on transformation: " + transform.getClass().toString() + "\n\n");
             recordReader.initialize(trainData, transform);
-            dataIterator = new RecordReaderDataSetIterator(recordReader, this.session.getBatchSize(), 1, this.session.getNumLabels());
-            scaler.fit(dataIterator);
-            dataIterator.setPreProcessor(scaler);
-            trainIter = new MultipleEpochsIterator(this.session.getNumEpochs(), dataIterator, this.session.getNCores());
+            dataIter = new RecordReaderDataSetIterator(recordReader, this.session.getBatchSize(), 1, this.session.getNumLabels());
+            scaler.fit(dataIter);
+            dataIter.setPreProcessor(scaler);
+            trainIter = new MultipleEpochsIterator(this.session.getNumEpochs(), dataIter, this.session.getNCores());
             network.fit(trainIter);
-
-            this.logger.insertLine("Training with transformations finished.");
         }
-    }
 
-    protected void trainWithoutTransformations() throws Exception {
-        this.logger.insertLine("Start training without transformations...");
-
-        ImageRecordReader recordReader = new ImageRecordReader(height, width, channels, this.labelMaker);
-        DataSetIterator dataIterator;
-        MultipleEpochsIterator trainIter;
-        DataNormalization scaler = new ImagePreProcessingScaler(0, 1);
-
-        recordReader.initialize(trainData, null);
-        dataIterator = new RecordReaderDataSetIterator(recordReader, this.session.getBatchSize(), 1, this.session.getNumLabels());
-        scaler.fit(dataIterator);
-        dataIterator.setPreProcessor(scaler);
-        trainIter = new MultipleEpochsIterator(this.session.getNumEpochs(), dataIterator, this.session.getNCores());
-        network.fit(trainIter);
-
-        this.logger.insertLine("Training without transformations finished.");
-    }
-
-    protected void evaluateModel() throws Exception {
-        this.logger.insertLine("Start Evaluate model...");
-
-        ImageRecordReader recordReader = new ImageRecordReader(height, width, channels, this.labelMaker);
-        DataNormalization scaler = new ImagePreProcessingScaler(0, 1);
-
+        this.logger.log("Evaluate model....");
         recordReader.initialize(testData);
-        DataSetIterator dataIterator;
-        dataIterator = new RecordReaderDataSetIterator(recordReader, this.session.getBatchSize(), 1, this.session.getNumLabels());
-        scaler.fit(dataIterator);
-        dataIterator.setPreProcessor(scaler);
-        Evaluation eval = network.evaluate(dataIterator);
+        dataIter = new RecordReaderDataSetIterator(recordReader, this.session.getBatchSize(), 1, this.session.getNumLabels());
+        scaler.fit(dataIter);
+        dataIter.setPreProcessor(scaler);
+        Evaluation eval = network.evaluate(dataIter);
+        this.logger.log(eval.stats(true));
 
-        this.logger.insertLine("Model Evaluation finished.");
-        this.logger.insertLine(eval.stats(true));
-
-        this.getPrediction(dataIterator);
-    }
-
-    protected void getPrediction(DataSetIterator dataIter) {
+        // Example on how to get predict results with trained model
         dataIter.reset();
         DataSet testDataSet = dataIter.next();
         String expectedResult = testDataSet.getLabelName(0);
         List<String> predict = network.predict(testDataSet);
         String modelResult = predict.get(0);
-
-        this.logger.insertLine("\nFor a single example that is labeled " + expectedResult + " the model predicted " + modelResult + "\n\n");
+        this.logger.log("\nFor a single example that is labeled " + expectedResult + " the model predicted " + modelResult + "\n\n");
     }
 
     public void save() {
-        this.logger.insertLine("Saving...");
+        this.logger.log("Saving...");
 
-        String basePath = FilenameUtils.concat(System.getProperty("user.dir"), this.session.getPath());
-        NetSaverLoaderUtils.saveNetworkAndParameters(network, basePath);
-        NetSaverLoaderUtils.saveUpdators(network, basePath);
+        NetSaverLoaderUtils.saveNetworkAndParameters(network, this.session.getModelsFolderPath());
+        NetSaverLoaderUtils.saveUpdators(network, this.session.getModelsFolderPath());
 
-        this.logger.insertLine("Saved Successfully!");
+        this.logger.log("Saved Successfully!");
     }
 
     public void setAlreadyTrained(boolean flag) {

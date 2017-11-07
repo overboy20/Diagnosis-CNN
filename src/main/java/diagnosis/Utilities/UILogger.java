@@ -9,7 +9,7 @@ public class UILogger {
         this.log = log;
     }
 
-    public void insertLine(String line) {
+    public void log(String line) {
         if (this.log.getLength() == 0) {
             this.log.setText(line);
         } else {

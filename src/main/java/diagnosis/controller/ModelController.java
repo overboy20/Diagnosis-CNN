@@ -8,6 +8,10 @@ import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.Stage;
+
+import java.io.File;
 
 public class ModelController {
 
@@ -24,7 +28,6 @@ public class ModelController {
     @FXML protected TextField   inputLearningRate;
     @FXML protected ComboBox    checkboxActivation;
     @FXML protected Button      btnStartTraining;
-    @FXML protected ProgressBar progress;
     @FXML protected TextArea    textareaLog;
 
     @FXML protected MenuItem menuitemSave;
@@ -33,8 +36,12 @@ public class ModelController {
     protected int MODEL_TYPE = Model.MODEL_ALEXNET;
 
     public void init() {
+        this.inputPath.setText(System.getProperty("user.dir") + "/src/main/resources/images"); //Default path
+
         this.initSliders();
         this.initActivationsOptions();
+        this.initCheckboxStates();
+
         this.bindEvents();
     }
 
@@ -68,6 +75,11 @@ public class ModelController {
                 this.sliderIterations.setValue(newVal.intValue()));
     }
 
+    public void initCheckboxStates() {
+        this.boxFlipRandom.setSelected(true);
+        this.boxWrap.setSelected(true);
+    }
+
     protected void initActivationsOptions() {
         this.checkboxActivation.getItems().addAll(
             TrainingHelper.ACTIVATION_FUNCTION_RELU,
@@ -79,6 +91,8 @@ public class ModelController {
             TrainingHelper.ACTIVATION_FUNCTION_SOFTSIGN,
             TrainingHelper.ACTIVATION_FUNCTION_TANH
         );
+
+        this.checkboxActivation.getSelectionModel().select(0);
     }
 
     protected void bindEvents() {
@@ -109,6 +123,15 @@ public class ModelController {
 
         helper.setAdditionalParameters(Double.parseDouble(learningRate), this.checkboxActivation.getSelectionModel().getSelectedItem().toString());
         helper.start(new UILogger(this.textareaLog));
+    }
+
+    @FXML public void choosePathHandler() {
+        DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle("Choose directory");
+        chooser.setInitialDirectory(new File(System.getProperty("user.dir")));
+
+        File dir = chooser.showDialog(new Stage());
+        inputPath.setText(dir.getAbsolutePath());
     }
 
     @FXML public void onClose() {

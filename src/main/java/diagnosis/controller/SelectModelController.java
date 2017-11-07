@@ -1,6 +1,6 @@
 package diagnosis.controller;
 
-import diagnosis.Classification.Model.ModelInterface;
+import diagnosis.Classification.Model.Model;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -17,15 +17,15 @@ public class SelectModelController {
     public void init() { }
 
     @FXML public void lenetModel() throws IOException {
-        this.openModelWindow(ModelInterface.MODEL_LENET);
+        this.openModelWindow(Model.MODEL_LENET);
     }
 
     @FXML public void alexnetModel() throws IOException {
-        this.openModelWindow(ModelInterface.MODEL_ALEXNET);
+        this.openModelWindow(Model.MODEL_ALEXNET);
     }
 
     @FXML public void customModel() throws IOException {
-        this.openModelWindow(ModelInterface.MODEL_CUSTOM);
+        this.openModelWindow(Model.MODEL_CUSTOM);
     }
 
     protected void openModelWindow(int modelType) throws IOException {
@@ -44,14 +44,14 @@ public class SelectModelController {
         ModelController controller = loader.getController();
 
         switch(modelType) {
-            case ModelInterface.MODEL_ALEXNET:
-                controller.setModelType(ModelInterface.MODEL_ALEXNET);
+            case Model.MODEL_ALEXNET:
+                controller.setModelType(Model.MODEL_ALEXNET);
                 break;
-            case ModelInterface.MODEL_LENET:
-                controller.setModelType(ModelInterface.MODEL_LENET);
+            case Model.MODEL_LENET:
+                controller.setModelType(Model.MODEL_LENET);
                 break;
-            case ModelInterface.MODEL_CUSTOM:
-                controller.setModelType(ModelInterface.MODEL_CUSTOM);
+            case Model.MODEL_CUSTOM:
+                controller.setModelType(Model.MODEL_CUSTOM);
                 break;
         }
 

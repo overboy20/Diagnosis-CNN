@@ -1,17 +1,25 @@
 package diagnosis.Classification.Helpers;
 
+import org.datavec.image.transform.ColorConversionTransform;
+import org.datavec.image.transform.FlipImageTransform;
+import org.datavec.image.transform.ImageTransform;
+import org.datavec.image.transform.WarpImageTransform;
+
 import java.util.ArrayList;
+import java.util.Random;
 
 public class TrainingSession {
     boolean flipTransform;
     boolean warpTransform;
     boolean colorTransform;
 
+    protected long seed = 42;
+    protected Random rng = new Random(seed);
+
     protected int batchSize = 20;
     protected int nCores = 2;
 
     protected int numExamples;
-    protected ArrayList<String> classes;
 
     protected int iterations;
     protected int epochs;
@@ -26,6 +34,25 @@ public class TrainingSession {
         this.colorTransform = color;
     }
 
+    public ArrayList<ImageTransform> getTransformations() {
+        ArrayList<ImageTransform> array = new ArrayList<>();
+
+        if(this.flipTransform) {
+            array.add(new FlipImageTransform(rng));
+            array.add(new FlipImageTransform(new Random(123)));
+        }
+
+        if(this.warpTransform) {
+            array.add(new WarpImageTransform(rng, 42));
+        }
+
+        if(this.colorTransform) {
+            array.add(new ColorConversionTransform(new Random(seed), 36));
+        }
+
+        return array;
+    }
+
     public void initTrainingOptions(int iterations, int epochs) {
         this.iterations = iterations;
         this.epochs = epochs;
@@ -34,7 +61,6 @@ public class TrainingSession {
     public void setImagesPath(String path) {
         this.path = path;
 
-        this.classes = this.parseClassesFromPath(path);
         this.numExamples = this.getExamplesNumber(path);
     }
 
@@ -44,14 +70,6 @@ public class TrainingSession {
 
     public void setnCores(int num) {
         this.nCores = num;
-    }
-
-    protected ArrayList<String> parseClassesFromPath(String path) {
-        ArrayList<String> classesList = new ArrayList<>();
-
-        //TODO: parse classes
-
-        return classesList;
     }
 
     public int getNumExamples() {
@@ -72,13 +90,20 @@ public class TrainingSession {
         return this.epochs;
     }
 
+    public int getNumIterations() {
+        return this.iterations;
+    }
+
     public int getNCores() {
         return this.nCores;
     }
 
     public String getPath() {
-        return "src/main/resources/"; //TODO
-//        return this.path;
+        return this.path;
+    }
+
+    public String getModelsFolderPath() {
+        return System.getProperty("user.dir") + "/src/main/resources/Models";
     }
 
     public int getExamplesNumber(String path) {
