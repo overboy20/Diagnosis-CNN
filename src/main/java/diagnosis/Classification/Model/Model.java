@@ -9,11 +9,15 @@ import org.datavec.api.split.InputSplit;
 import org.datavec.image.loader.NativeImageLoader;
 import org.datavec.image.recordreader.ImageRecordReader;
 import org.datavec.image.transform.ImageTransform;
+import org.deeplearning4j.api.storage.StatsStorage;
 import org.deeplearning4j.datasets.datavec.RecordReaderDataSetIterator;
 import org.deeplearning4j.datasets.iterator.MultipleEpochsIterator;
 import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
+import org.deeplearning4j.ui.api.UIServer;
+import org.deeplearning4j.ui.stats.StatsListener;
+import org.deeplearning4j.ui.storage.InMemoryStatsStorage;
 import org.deeplearning4j.util.NetSaverLoaderUtils;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
@@ -53,11 +57,18 @@ abstract public class Model extends Layer {
     abstract public MultiLayerNetwork getModel();
 
     public void run() throws Exception {
-        System.out.println(session.getNumEpochs());
-        System.out.println(session.getNumIterations());
         this.logger.log("run...");
 
         this.network = this.getModel();
+
+        UIServer uiServer = UIServer.getInstance();
+        StatsStorage statsStorage = new InMemoryStatsStorage();
+        this.network.setListeners(new StatsListener(statsStorage, listenerFreq));
+        uiServer.attach(statsStorage);
+
+        this.network.init();
+        this.network.setListeners(new ScoreIterationListener(listenerFreq), new StatsListener(statsStorage, listenerFreq));
+
         this.trainModel();
         //TODO: Redirect default logging to application logger
         //TODO: split threads
@@ -96,10 +107,7 @@ abstract public class Model extends Layer {
          *  - how to normalize images and generate large dataset to train on
          **/
         DataNormalization scaler = new ImagePreProcessingScaler(0, 1);
-
         this.logger.log("Build model....");
-        this.network.init();
-        this.network.setListeners(new ScoreIterationListener(listenerFreq));
 
         /**
          * Data Setup -> define how to load data into net:

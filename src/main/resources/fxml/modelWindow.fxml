@@ -20,11 +20,11 @@
          <children>
             <Pane prefHeight="424.0" prefWidth="545.0">
                <children>
-                  <Button fx:id="btnSelectPath" layoutX="497.0" layoutY="14.0" mnemonicParsing="false" text="..." onAction="#choosePathHandler" />
+                  <Button fx:id="btnSelectPath" layoutX="497.0" layoutY="14.0" mnemonicParsing="false" onAction="#choosePathHandler" text="..." />
                   <TextField fx:id="inputPath" editable="false" layoutX="99.0" layoutY="14.0" prefHeight="22.0" prefWidth="385.0" />
                   <Label layoutX="14.0" layoutY="18.0" text="Path to images:" />
                   <TextArea fx:id="textareaLog" editable="false" layoutX="10.0" layoutY="260.0" prefHeight="155.0" prefWidth="514.0" />
-                  <Button fx:id="btnStartTraining" layoutX="210.0" layoutY="212.0" mnemonicParsing="false" onAction="#startTrainingClick" prefHeight="31.0" prefWidth="90.0" text="Start training" />
+                  <Button fx:id="btnStartTraining" defaultButton="true" layoutX="167.0" layoutY="212.0" mnemonicParsing="false" onAction="#startTrainingClick" prefHeight="31.0" prefWidth="90.0" text="Start training" />
                   <Label layoutX="14.0" layoutY="53.0" text="Epochs number:" />
                   <Slider fx:id="sliderEpochs" layoutX="99.0" layoutY="54.0" prefHeight="13.0" prefWidth="418.0" />
                   <Label layoutX="14.0" layoutY="85.0" text="Iterations:" />
@@ -38,6 +38,7 @@
                   <Label layoutX="271.0" layoutY="170.0" text="Activation:" />
                   <ComboBox fx:id="checkboxActivation" layoutX="343.0" layoutY="166.0" prefHeight="22.0" prefWidth="181.0" promptText="Select function" />
                   <TextField fx:id="inputLearningRate" layoutX="100.0" layoutY="166.0" prefHeight="22.0" prefWidth="163.0" text="0.01" />
+                  <Button fx:id="btnVisualize" disable="true" layoutX="264.0" layoutY="212.0" mnemonicParsing="false" onAction="#visualizeClick" prefHeight="31.0" prefWidth="88.0" text="Visualize" />
                </children>
             </Pane>
          </children>

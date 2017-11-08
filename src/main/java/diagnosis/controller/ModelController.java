@@ -7,7 +7,10 @@ import diagnosis.Utilities.UILogger;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
@@ -28,6 +31,7 @@ public class ModelController {
     @FXML protected TextField   inputLearningRate;
     @FXML protected ComboBox    checkboxActivation;
     @FXML protected Button      btnStartTraining;
+    @FXML protected Button      btnVisualize;
     @FXML protected TextArea    textareaLog;
 
     @FXML protected MenuItem menuitemSave;
@@ -123,6 +127,21 @@ public class ModelController {
 
         helper.setAdditionalParameters(Double.parseDouble(learningRate), this.checkboxActivation.getSelectionModel().getSelectedItem().toString());
         helper.start(new UILogger(this.textareaLog));
+        this.btnVisualize.setDisable(false);
+    }
+
+    @FXML protected void visualizeClick() throws Exception {
+        Stage modelWindow = new Stage();
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/VisualizeWindow.fxml"));
+        VBox root = loader.load();
+        Scene scene = new Scene(root);
+        modelWindow.setScene(scene);
+        modelWindow.setResizable(false);
+        modelWindow.setTitle("Visualization");
+        modelWindow.show();
+
+        VisualizationController controller = loader.getController();
+        controller.init();
     }
 
     @FXML public void choosePathHandler() {
