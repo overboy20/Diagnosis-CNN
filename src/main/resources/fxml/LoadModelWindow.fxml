@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox fx:controller="diagnosis.controller.LoadModelController" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="286.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Pane prefHeight="296.0" prefWidth="600.0">
+         <children>
+            <Label layoutX="25.0" layoutY="39.0" text="Model Location:" />
+            <TextField fx:id="inputModelLocation" editable="false" layoutX="124.0" layoutY="35.0" prefHeight="25.0" prefWidth="426.0" />
+            <Button fx:id="btnOpenModelLocation" onAction="#openModelClick" layoutX="555.0" layoutY="34.0" mnemonicParsing="false" text="..." />
+            <Label layoutX="25.0" layoutY="94.0" prefHeight="17.0" prefWidth="85.0" text="Image Location:" />
+            <TextField fx:id="inputImageLocation" editable="false" layoutX="124.0" layoutY="91.0" prefHeight="25.0" prefWidth="426.0" />
+            <Button fx:id="btnOpenImageLocation" onAction="#openImageClick" layoutX="555.0" layoutY="90.0" mnemonicParsing="false" text="..." />
+            <Label layoutX="213.0" layoutY="14.0" text="Select Pretrained Model Location" />
+            <Label layoutX="254.0" layoutY="71.0" text="Select Test Image" />
+            <Button fx:id="btnPredict" onAction="#btnPredictClick" layoutX="274.0" layoutY="130.0" mnemonicParsing="false" text="Predict" />
+            <TextArea fx:id="textareaPrediction" editable="false" layoutX="20.0" layoutY="162.0" prefHeight="100.0" prefWidth="561.0" />
+         </children>
+      </Pane>
+   </children>
+</VBox>

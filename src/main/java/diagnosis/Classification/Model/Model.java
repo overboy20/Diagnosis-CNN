@@ -18,6 +18,7 @@ import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
 import org.deeplearning4j.ui.api.UIServer;
 import org.deeplearning4j.ui.stats.StatsListener;
 import org.deeplearning4j.ui.storage.InMemoryStatsStorage;
+import org.deeplearning4j.util.ModelSerializer;
 import org.deeplearning4j.util.NetSaverLoaderUtils;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
@@ -157,11 +158,15 @@ abstract public class Model extends Layer {
         this.logger.log("\nFor a single example that is labeled " + expectedResult + " the model predicted " + modelResult + "\n\n");
     }
 
-    public void save() {
+    public void save() throws Exception {
         this.logger.log("Saving...");
 
-        NetSaverLoaderUtils.saveNetworkAndParameters(network, this.session.getModelsFolderPath());
-        NetSaverLoaderUtils.saveUpdators(network, this.session.getModelsFolderPath());
+//        NetSaverLoaderUtils.saveNetworkAndParameters(network, this.session.getModelsFolderPath());
+//        NetSaverLoaderUtils.saveUpdators(network, this.session.getModelsFolderPath());
+        Random r = new Random(seed);
+
+        File locationToSave = new File(this.session.getModelsFolderPath() + r.toString() + "_MultiLayerNetwork.zip");
+        ModelSerializer.writeModel(network, locationToSave, true);
 
         this.logger.log("Saved Successfully!");
     }

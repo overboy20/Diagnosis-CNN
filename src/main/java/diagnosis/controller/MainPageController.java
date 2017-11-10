@@ -29,8 +29,15 @@ public class MainPageController {
         controller.init();
     }
 
-    @FXML public void loadModelClickHandler() {
-        System.out.println("here 2");
+    @FXML public void loadModelClickHandler() throws Exception {
+        Stage modelWindow = new Stage();
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/LoadModelWindow.fxml"));
+        VBox root = loader.load();
+        Scene scene = new Scene(root);
+        modelWindow.setScene(scene);
+        modelWindow.setResizable(false);
+        modelWindow.setTitle("Load Model");
+        modelWindow.show();
     }
 
     public void init() { }

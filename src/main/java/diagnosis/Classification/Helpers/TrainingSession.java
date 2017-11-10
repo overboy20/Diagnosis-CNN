@@ -103,7 +103,7 @@ public class TrainingSession {
     }
 
     public String getModelsFolderPath() {
-        return System.getProperty("user.dir") + "/src/main/resources/Models";
+        return System.getProperty("user.dir") + "/src/main/resources/Models/";
     }
 
     public int getExamplesNumber(String path) {
